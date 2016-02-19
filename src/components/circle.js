@@ -17,14 +17,17 @@ function collect(connect, monitor) {
 }
 
 class Circle extends React.Component {
-	getComponent() {
-		return "FOOBAR";
-	}
 
 	render() {
 
 		return this.props.connectDragSource(
-			<div style={{width: "10px", height: "10px"}}><svg height="10" width="10"><g transform="translate(5 5)">{innerCircle}</g></svg></div>
+			<div style={{width: "10px", height: "10px"}}>
+				<svg height="10" width="10">
+					<g transform="translate(5 5)">
+						{innerCircle}
+					</g>
+				</svg>
+			</div>
 		);
 	}
 }

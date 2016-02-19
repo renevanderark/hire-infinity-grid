@@ -51,7 +51,6 @@ class InfinityGrid extends React.Component {
 		window.removeEventListener("mouseup", this.mouseupListener);
 	}
 
-
 	onMouseDown(ev) {
 		this.mousePos.x = ev.clientX;
 		this.mousePos.y = ev.clientY;
@@ -76,26 +75,29 @@ class InfinityGrid extends React.Component {
 		this.mouseState = MOUSE_UP;
 	}
 
-
-
 	onResize() {
-		let node = ReactDOM.findDOMNode(this).parentNode;
+		const node = ReactDOM.findDOMNode(this).parentNode;
 		this.props.onResize(node.getBoundingClientRect());
 	}
 
 	render() {
-		let [x, y, w, h] = this.props.grid.viewBox;
+		const [x, y, w, h] = this.props.grid.viewBox;
 		return this.props.connectDropTarget(
 			<svg onMouseDown={this.onMouseDown.bind(this)}
-				style={{width: (this.props.grid.viewBox[2] + 2 )+ "px", height: (this.props.grid.viewBox[3] + 2) + "px"}}
+				style={{
+					width: (this.props.grid.viewBox[2] + 2 )+ "px",
+					height: (this.props.grid.viewBox[3] + 2) + "px"
+				}}
 				viewBox={this.props.grid.viewBox.join(" ")}>
 
 				{range(this.props.grid.gridSize - (x % this.props.grid.gridSize) + x - this.props.grid.gridSize, w + this.props.grid.gridSize, this.props.grid.gridSize).map((val) =>
 					<line key={`x-${val}`} stroke="rgb(196,196,196)" x1={val} x2={val} y1={y} y2={y + h} />
 				)}
+
 				{range(this.props.grid.gridSize - (y % this.props.grid.gridSize) + y - this.props.grid.gridSize, h + this.props.grid.gridSize, this.props.grid.gridSize).map((val) =>
 					<line key={`y-${val}`} stroke="rgb(196,196,196)" x1={x} x2={x + w} y1={val} y2={val} />
 				)}
+
 				{this.props.grid.components.map((component, i) => (
 					<g key={i} transform={`translate(${component.x} ${component.y})`}>
 						{component.component}
