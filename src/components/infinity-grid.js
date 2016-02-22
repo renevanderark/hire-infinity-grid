@@ -104,6 +104,7 @@ class InfinityGrid extends React.Component {
 		const me = ReactDOM.findDOMNode(this);
 		if(!me) { this.setState({resizeCaught: false}); return; }
 		const node = me.parentNode;
+
 		this.props.actions.onResize(node.getBoundingClientRect());
 		this.setState({resizeCaught: false});
 	}
@@ -121,7 +122,6 @@ class InfinityGrid extends React.Component {
 
 	render() {
 		const [x, y, w, h] = this.props.viewBox;
-
 		return this.props.connectDropTarget(
 			<svg id="grid-svg"
 				onDragStart={(ev) => ev.preventDefault()}

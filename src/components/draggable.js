@@ -8,7 +8,6 @@ export default (DragComponent, DropComponent) => {
 
 	const componentSource = {
 		beginDrag: (props) => {
-			console.log(props);
 			return {
 				dropComponent: DropComponent,
 				props: props

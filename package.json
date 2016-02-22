@@ -1,6 +1,7 @@
 {
   "name": "infinity-grid",
   "version": "0.0.0",
+  "main": "build/index.js",
   "author": {
     "name": "René van der Ark",
     "email": "rene.van.der.ark@huygens.knaw.nl"
@@ -10,19 +11,18 @@
     "url": ""
   },
   "scripts": {
-    "start": "scripts/server.js",
-    "watch": "scripts/watch.sh"
+    "start": "scripts/watch.sh"
   },
   "dependencies": {
-    "babel-polyfill": "^6.5.0",
     "clone-deep": "^0.2.4",
-    "react": "^0.14.7",
-    "react-dnd": "^2.1.2",
-    "react-dnd-html5-backend": "^2.1.2",
-    "react-dnd-touch-backend": "^0.2.4",
-    "react-dom": "^0.14.7",
     "redux": "^3.2.1",
     "redux-thunk": "^1.0.3"
+  },
+  "peerDependencies": {
+    "react": "^0.14.7",
+    "react-dnd": "^2.1.2",
+    "react-dnd-touch-backend": "^0.2.4",
+    "react-dom": "^0.14.7"
   },
   "devDependencies": {
     "babel": "^5.8.23",
@@ -32,12 +32,9 @@
     "babelify": "^6.3.0",
     "browser-sync": "^2.9.6",
     "browserify": "^11.2.0",
-    "connect-modrewrite": "^0.8.5",
+    "derequire": "^2.0.3",
     "eslint": "^1.5.1",
     "eslint-plugin-react": "^3.16.1",
-    "lodash.debounce": "^3.1.1",
-    "nib": "^1.1.0",
-    "stylus": "^0.53.0",
     "watchify": "^3.4.0"
   }
 }

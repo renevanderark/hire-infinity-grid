@@ -1,28 +1,33 @@
 import React from "react";
 import InfinityGrid from "./infinity-grid";
-import { DragDropContext } from "react-dnd";
-import { default as TouchBackend } from "react-dnd-touch-backend";
-import Circle from "./circle";
-import Square from "./square";
+import actions from "../actions";
+import store from "../store";
+
 
 class App extends React.Component {
-	render() {
-		return (<div>
-			<div>
-				<div style={{"display": "inline-block"}}><Circle onClick={() => console.log("circle") } /></div>
-				<div style={{"display": "inline-block"}}><Square onClick={() => console.log("square") } /></div>
-			</div>
 
-			<div style={{width: "100%", height: "400px"}}>
-				<InfinityGrid {...this.props.grid} actions={this.props.actions} />
+	constructor(props) {
+		super(props);
+		this.state = store.getState();
+		this.unsubscribe = store.subscribe(this.onState.bind(this));
+	}
+
+	componentWillUnmount() {
+		this.unsubscribe();
+	}
+
+	onState() {
+		this.setState(store.getState());
+	}
+
+	render() {
+
+		return (
+			<div style={{width: "100%", height: "100%"}}>
+				<InfinityGrid {...this.state.grid} actions={actions} />
 			</div>
-		</div>);
+		);
 	}
 }
 
-App.propTypes = {
-	actions: React.PropTypes.object,
-	grid: React.PropTypes.object
-};
-
-export default DragDropContext(TouchBackend({ enableMouseEvents: true }))(App);
+export default App;
