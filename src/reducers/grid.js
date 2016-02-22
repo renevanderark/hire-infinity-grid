@@ -3,7 +3,7 @@ import setIn from "./util/set-in";
 
 let initialState = {
 	viewBox: [0, 0, 0, 0],
-	gridSize: 150,
+	gridSize: 100,
 	components: []
 };
 

@@ -19,6 +19,7 @@
     "react": "^0.14.7",
     "react-dnd": "^2.1.2",
     "react-dnd-html5-backend": "^2.1.2",
+    "react-dnd-touch-backend": "^0.2.4",
     "react-dom": "^0.14.7",
     "redux": "^3.2.1",
     "redux-thunk": "^1.0.3"
