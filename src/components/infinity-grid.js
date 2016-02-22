@@ -17,7 +17,7 @@ const range = (begin, amount, interval = 1) => {
 const target = {
 	drop(props, monitor) {
 		const {x, y} = monitor.getClientOffset();
-		props.actions.onAddComponent(monitor.getItem().innerComponent, {
+		props.actions.onAddComponent(monitor.getItem().dropComponent, {
 			x: x - props.domPos.x, y: y - props.domPos.y
 		});
 	}

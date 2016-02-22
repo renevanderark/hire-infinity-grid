@@ -8,7 +8,9 @@ export default (DragComponent, DropComponent) => {
 
 	const componentSource = {
 		beginDrag: (props) => {
-			return {innerComponent: <DropComponent {...props} />};
+			return {
+				dropComponent: <DropComponent {...props} />
+			};
 		}
 	};
 
