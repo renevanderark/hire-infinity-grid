@@ -1,6 +1,8 @@
 Infinity Grid
 ===
 
+[Demo here](http://renevanderark.github.io/infinity-grid/)
+
 
 ```javascript
 import React from "react";
