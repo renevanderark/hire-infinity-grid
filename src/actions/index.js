@@ -7,8 +7,8 @@ const setViewportRect = (rect) => (dispatch, getState) =>
 	});
 
 const moveViewport = (movement) => (dispatch, getState) => {
-	const newX = /*getState().grid.viewBox[0] < 0 ? */getState().grid.viewBox[0] + movement.x /*: movement.x - getState().grid.viewBox[0]*/;
-	const newY = /*getState().grid.viewBox[1] < 0 ? */getState().grid.viewBox[1] + movement.y /*: movement.y - getState().grid.viewBox[1]*/;
+	const newX = getState().grid.viewBox[0] + movement.x;
+	const newY = getState().grid.viewBox[1] + movement.y;
 	dispatch({
 		type: "SET_VIEWBOX_RECT",
 		viewBox: [newX, newY, getState().grid.viewBox[2], getState().grid.viewBox[3]]

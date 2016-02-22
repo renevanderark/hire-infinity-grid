@@ -7,14 +7,15 @@ import HTML5Backend from "react-dnd-html5-backend";
 class App extends React.Component {
 	render() {
 		return (<div style={{width: "100%", height: "400px"}}>
-			<InfinityGrid {...this.props} />
-			<Components {...this.props} />
+			<InfinityGrid {...this.props.grid} actions={this.props.actions} />
+			<Components />
 		</div>);
 	}
 }
 
 App.propTypes = {
-
+	actions: React.PropTypes.object,
+	grid: React.PropTypes.object
 };
 
 export default DragDropContext(HTML5Backend)(App);
