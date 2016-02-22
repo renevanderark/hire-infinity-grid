@@ -16,7 +16,10 @@ const range = (begin, amount, interval = 1) => {
 
 const target = {
 	drop(props, monitor) {
-		props.actions.onAddComponent(monitor.getItem().innerComponent, monitor.getClientOffset());
+		const {x, y} = monitor.getClientOffset();
+		props.actions.onAddComponent(monitor.getItem().innerComponent, {
+			x: x - props.domPos.x, y: y - props.domPos.y
+		});
 	}
 };
 
@@ -36,15 +39,21 @@ class InfinityGrid extends React.Component {
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.mousePos = this.movement = {};
 		this.mouseState = MOUSE_UP;
+		this.state = {
+			resizeCaught: false
+		};
 	}
 
 	componentDidMount() {
 		window.addEventListener("resize", this.resizeListener);
 		window.addEventListener("mousemove", this.mousemoveListener);
 		window.addEventListener("mouseup", this.mouseupListener);
-		this.onResize();
+		this.commitResize();
 	}
 
+	componentDidUpdate() {
+		if(this.state.resizeCaught) { this.commitResize(); }
+	}
 
 	componentWillUnmount() {
 		window.removeEventListener("resize", this.resizeListener);
@@ -76,7 +85,7 @@ class InfinityGrid extends React.Component {
 				this.mousePos.x = ev.clientX;
 				this.mousePos.y = ev.clientY;
 				this.props.actions.onDrag(this.movement);
-				return ev.preventDefault();
+				return;
 			default:
 		}
 	}
@@ -85,15 +94,24 @@ class InfinityGrid extends React.Component {
 		this.mouseState = MOUSE_UP;
 	}
 
-	onResize() {
-		const node = ReactDOM.findDOMNode(this).parentNode;
+	commitResize() {
+		const me = ReactDOM.findDOMNode(this);
+		if(!me) { this.setState({resizeCaught: false}); return; }
+		const node = me.parentNode;
 		this.props.actions.onResize(node.getBoundingClientRect());
+		this.setState({resizeCaught: false});
+	}
+
+	onResize() {
+		this.setState({resizeCaught: true});
 	}
 
 	render() {
 		const [x, y, w, h] = this.props.viewBox;
+
 		return this.props.connectDropTarget(
-			<svg onDragStart={(ev) => ev.preventDefault()}
+			<svg id="grid-svg"
+				onDragStart={(ev) => ev.preventDefault()}
 				onMouseDown={this.onMouseDown.bind(this)}
 				onTouchEnd={this.onMouseUp.bind(this)}
 				onTouchMove={this.onTouchMove.bind(this)}

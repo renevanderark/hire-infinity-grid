@@ -5,9 +5,10 @@ import { GRID_ITEM } from "./types";
 
 export default (DragComponent, DropComponent) => {
 	const DraggingComponent = dragging(DragComponent);
+
 	const componentSource = {
-		beginDrag: () => {
-			return {innerComponent: <DropComponent />};
+		beginDrag: (props) => {
+			return {innerComponent: <DropComponent {...props} />};
 		}
 	};
 
@@ -21,9 +22,9 @@ export default (DragComponent, DropComponent) => {
 
 	class Draggable extends React.Component {
 		render() {
-			return this.props.isDragging ?
-				this.props.dragPreview(<div><DraggingComponent /></div>) :
-				this.props.dragSource(<div><DragComponent /></div>);
+			return (this.props.isDragging ?
+							this.props.dragPreview(<div key="drag" ><DraggingComponent /></div>) :
+							this.props.dragSource(<div><DragComponent /></div>));
 		}
 	}
 

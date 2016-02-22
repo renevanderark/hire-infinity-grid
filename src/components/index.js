@@ -5,18 +5,16 @@ import { default as TouchBackend } from "react-dnd-touch-backend";
 import Circle from "./circle";
 import Square from "./square";
 
-
-
 class App extends React.Component {
 	render() {
 		return (<div>
+			<div>
+				<div style={{"display": "inline-block"}}><Circle onClick={() => console.log("circle") } /></div>
+				<div style={{"display": "inline-block"}}><Square onClick={() => console.log("square") } /></div>
+			</div>
+
 			<div style={{width: "100%", height: "400px"}}>
 				<InfinityGrid {...this.props.grid} actions={this.props.actions} />
-			</div>
-			<div>
-
-				<Circle />
-				<Square />
 			</div>
 		</div>);
 	}
