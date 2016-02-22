@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { DropTarget } from "react-dnd";
-import { GRID_ENTITY } from "./types";
+import itemTypes from "./types";
 
 const MOUSE_DOWN = 1;
 const MOUSE_UP = 0;
@@ -93,7 +93,8 @@ class InfinityGrid extends React.Component {
 	render() {
 		const [x, y, w, h] = this.props.viewBox;
 		return this.props.connectDropTarget(
-			<svg onMouseDown={this.onMouseDown.bind(this)}
+			<svg onDragStart={(ev) => ev.preventDefault()}
+				onMouseDown={this.onMouseDown.bind(this)}
 				onTouchEnd={this.onMouseUp.bind(this)}
 				onTouchMove={this.onTouchMove.bind(this)}
 				onTouchStart={this.onTouchStart.bind(this)}
@@ -130,4 +131,4 @@ InfinityGrid.propTypes = {
 	viewBox: React.PropTypes.array
 };
 
-export default DropTarget(GRID_ENTITY, target, collect)(InfinityGrid);
+export default DropTarget(itemTypes, target, collect)(InfinityGrid);

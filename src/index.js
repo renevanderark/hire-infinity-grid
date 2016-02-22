@@ -6,6 +6,10 @@ import store from "./store";
 import actions from "./actions";
 import App from "./components";
 
+document.addEventListener("dragstart", function() {
+	return false;
+});
+
 document.addEventListener("DOMContentLoaded", () => {
 
 

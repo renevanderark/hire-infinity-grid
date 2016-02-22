@@ -1,8 +1,10 @@
 import React from "react";
-import {DragSource} from "react-dnd";
-import { GRID_ENTITY } from "./types";
+import dragging from "./dragging";
+import { DragSource } from "react-dnd";
+import { GRID_ITEM } from "./types";
 
 export default (DragComponent, DropComponent) => {
+	const DraggingComponent = dragging(DragComponent);
 	const componentSource = {
 		beginDrag: () => {
 			return {innerComponent: <DropComponent />};
@@ -11,25 +13,25 @@ export default (DragComponent, DropComponent) => {
 
 	function collect(connect, monitor) {
 		return {
-			connectDragSource: connect.dragSource(),
+			dragSource: connect.dragSource(),
+			dragPreview: connect.dragPreview(),
 			isDragging: monitor.isDragging()
 		};
 	}
 
 	class Draggable extends React.Component {
 		render() {
-			return this.props.connectDragSource(
-				<div>
-					<DragComponent />
-				</div>
-			);
+			return this.props.isDragging ?
+				this.props.dragPreview(<div><DraggingComponent /></div>) :
+				this.props.dragSource(<div><DragComponent /></div>);
 		}
 	}
 
 	Draggable.propTypes = {
-		connectDragSource: React.PropTypes.func.isRequired,
+		dragPreview: React.PropTypes.func.isRequired,
+		dragSource: React.PropTypes.func.isRequired,
 		isDragging: React.PropTypes.bool.isRequired
 	};
 
-	return DragSource(GRID_ENTITY, componentSource, collect)(Draggable);
+	return DragSource(GRID_ITEM, componentSource, collect)(Draggable);
 };

@@ -1,3 +1,3 @@
-export default {
-	GRID_ENTITY: "GRID_ENTITY"
-};
+export const GRID_ITEM = "GRID_ITEM";
+
+export default [GRID_ITEM];
