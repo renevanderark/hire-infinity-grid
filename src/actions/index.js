@@ -1,13 +1,13 @@
 import store from "../store";
 
 const setViewportRect = (rect) => (dispatch, getState) => {
-	console.log(rect);
 	dispatch({
 		type: "SET_VIEWBOX_RECT",
 		viewBox: [getState().grid.viewBox[0], getState().grid.viewBox[1], Math.floor(rect.width) - 2, Math.floor(rect.height) - 2],
 		domPos: {x: rect.left, y: rect.top}
 	});
 };
+
 const moveViewport = (movement) => (dispatch, getState) => {
 	const newX = getState().grid.viewBox[0] + movement.x;
 	const newY = getState().grid.viewBox[1] + movement.y;
@@ -19,11 +19,20 @@ const moveViewport = (movement) => (dispatch, getState) => {
 	});
 };
 
-const addComponent = (component, pos) => (dispatch, getState) => {
+const moveComponent = (movement, idx) => (dispatch) => {
+	dispatch({
+		type: "MOVE_COMPONENT",
+		movement: movement,
+		idx: idx
+	});
+};
+
+const addComponent = (component, spec) => (dispatch, getState) => {
 	dispatch({
 		type: "ADD_COMPONENT",
-		x: getState().grid.viewBox[0] + pos.x,
-		y: getState().grid.viewBox[1] + pos.y,
+		x: getState().grid.viewBox[0] + spec.x,
+		y: getState().grid.viewBox[1] + spec.y,
+		props: spec.props,
 		component: component
 	});
 };
@@ -31,5 +40,6 @@ const addComponent = (component, pos) => (dispatch, getState) => {
 export default {
 	onResize: (value) => store.dispatch(setViewportRect(value)),
 	onDrag: (movement) => store.dispatch(moveViewport(movement)),
+	onDragComponent: (movement, idx) => store.dispatch(moveComponent(movement, idx)),
 	onAddComponent: (component, pos) => store.dispatch(addComponent(component, pos))
 };

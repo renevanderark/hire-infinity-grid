@@ -20,7 +20,19 @@ export default function(state=initialState, action) {
 				components: setIn([state.components.length], {
 					x: action.x,
 					y: action.y,
+					props: action.props,
 					component: action.component
+				}, clone(state.components))
+			};
+		case "MOVE_COMPONENT":
+			const idx = action.idx;
+			return {
+				...state,
+				components: setIn([idx], {
+					x: state.components[idx].x - action.movement.x,
+					y: state.components[idx].y - action.movement.y,
+					props: state.components[idx].props,
+					component: state.components[idx].component
 				}, clone(state.components))
 			};
 		default:

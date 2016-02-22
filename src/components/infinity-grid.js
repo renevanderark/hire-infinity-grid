@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { DropTarget } from "react-dnd";
 import itemTypes from "./types";
 
+const COMPONENT_DOWN = 2;
 const MOUSE_DOWN = 1;
 const MOUSE_UP = 0;
 
@@ -18,7 +19,7 @@ const target = {
 	drop(props, monitor) {
 		const {x, y} = monitor.getClientOffset();
 		props.actions.onAddComponent(monitor.getItem().dropComponent, {
-			x: x - props.domPos.x, y: y - props.domPos.y
+			x: x - props.domPos.x, y: y - props.domPos.y, props: monitor.getItem().props
 		});
 	}
 };
@@ -40,7 +41,8 @@ class InfinityGrid extends React.Component {
 		this.mousePos = this.movement = {};
 		this.mouseState = MOUSE_UP;
 		this.state = {
-			resizeCaught: false
+			resizeCaught: false,
+			draggingComponent: -1
 		};
 	}
 
@@ -65,7 +67,7 @@ class InfinityGrid extends React.Component {
 		this.mousePos.x = ev.clientX;
 		this.mousePos.y = ev.clientY;
 		this.movement = {x: 0, y: 0};
-		this.mouseState = MOUSE_DOWN;
+		this.mouseState = this.mouseState === COMPONENT_DOWN ? COMPONENT_DOWN : MOUSE_DOWN;
 	}
 
 	onTouchStart(ev) {
@@ -78,20 +80,24 @@ class InfinityGrid extends React.Component {
 
 
 	onMouseMove(ev) {
+		this.movement.x = this.mousePos.x - ev.clientX;
+		this.movement.y = this.mousePos.y - ev.clientY;
+		this.mousePos.x = ev.clientX;
+		this.mousePos.y = ev.clientY;
+
 		switch(this.mouseState) {
 			case MOUSE_DOWN:
-				this.movement.x = this.mousePos.x - ev.clientX;
-				this.movement.y = this.mousePos.y - ev.clientY;
-				this.mousePos.x = ev.clientX;
-				this.mousePos.y = ev.clientY;
-				this.props.actions.onDrag(this.movement);
-				return;
+				return this.props.actions.onDrag(this.movement);
+			case COMPONENT_DOWN:
+				return this.props.actions.onDragComponent(this.movement, this.state.draggingComponent);
 			default:
 		}
 	}
 
 	onMouseUp() {
 		this.mouseState = MOUSE_UP;
+		this.setState({draggingComponent: -1});
+
 	}
 
 	commitResize() {
@@ -105,6 +111,13 @@ class InfinityGrid extends React.Component {
 	onResize() {
 		this.setState({resizeCaught: true});
 	}
+
+
+	startComponentDrag(idx) {
+		this.mouseState = COMPONENT_DOWN;
+		this.setState({draggingComponent: idx});
+	}
+
 
 	render() {
 		const [x, y, w, h] = this.props.viewBox;
@@ -133,7 +146,12 @@ class InfinityGrid extends React.Component {
 
 				{this.props.components.map((component, i) => (
 					<g key={i} transform={`translate(${component.x} ${component.y})`}>
-						{component.component}
+						<component.component
+							{...component.props}
+							onMouseDown={this.startComponentDrag.bind(this, i)}
+							onTouchStart={this.startComponentDrag.bind(this, i)}
+							style={{opacity: this.state.draggingComponent === i ? .5 : 1}}
+						/>
 					</g>
 				))}
 			</svg>
