@@ -117,16 +117,18 @@ class InfinityGrid extends React.Component {
 	}
 
 
-	startComponentDrag(idx) {
-		this.mouseState = COMPONENT_DOWN;
-		this.componentIndex = idx;
+	startComponentDrag(idx, ev) {
+		if((ev.target.getAttribute("class") || "").split(" ").indexOf("handle") > -1) {
+			this.mouseState = COMPONENT_DOWN;
+			this.componentIndex = idx;
+		}
 	}
 
 	changeComponentProps(idx, props) {
 		this.props.actions.onSetComponentProps(props, idx);
 	}
 
-	onComponentClick(idx, component) {
+	onComponentClick(idx, component, ev) {
 		if(this.state.draggingComponent === -1) {
 			this.props.actions.onSelectComponent(idx, () => {
 				component.props.onSelect(idx, component.props, (props) => this.changeComponentProps(idx, props));

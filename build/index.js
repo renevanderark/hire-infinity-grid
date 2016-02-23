@@ -3687,9 +3687,11 @@ var InfinityGrid = (function (_React$Component) {
 		}
 	}, {
 		key: "startComponentDrag",
-		value: function startComponentDrag(idx) {
-			this.mouseState = COMPONENT_DOWN;
-			this.componentIndex = idx;
+		value: function startComponentDrag(idx, ev) {
+			if ((ev.target.getAttribute("class") || "").split(" ").indexOf("handle") > -1) {
+				this.mouseState = COMPONENT_DOWN;
+				this.componentIndex = idx;
+			}
 		}
 	}, {
 		key: "changeComponentProps",
@@ -3698,7 +3700,7 @@ var InfinityGrid = (function (_React$Component) {
 		}
 	}, {
 		key: "onComponentClick",
-		value: function onComponentClick(idx, component) {
+		value: function onComponentClick(idx, component, ev) {
 			var _this = this;
 
 			if (this.state.draggingComponent === -1) {
