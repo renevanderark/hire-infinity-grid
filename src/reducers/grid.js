@@ -9,6 +9,7 @@ let initialState = {
 };
 
 export default function(state=initialState, action) {
+	let idx;
 	switch (action.type) {
 		case "SET_VIEWBOX_RECT":
 			return {
@@ -25,7 +26,7 @@ export default function(state=initialState, action) {
 				}, clone(state.components))
 			};
 		case "MOVE_COMPONENT":
-			const idx = action.idx;
+			idx = action.idx;
 			return {
 				...state,
 				components: setIn([idx], {
@@ -35,6 +36,16 @@ export default function(state=initialState, action) {
 					component: state.components[idx].component
 				}, clone(state.components))
 			};
+		case "SET_COMPONENT_PROPS":
+			idx = action.idx;
+			return {
+				...state,
+				components: setIn([idx, "props"], {
+					...state.components[idx].props,
+					...action.props
+				}, clone(state.components))
+			};
+
 		default:
 			return state;
 	}

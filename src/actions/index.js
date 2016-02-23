@@ -27,6 +27,14 @@ const moveComponent = (movement, idx) => (dispatch) => {
 	});
 };
 
+const setComponentProps = (props, idx) => (dispatch) => {
+	dispatch({
+		type: "SET_COMPONENT_PROPS",
+		idx: idx,
+		props: props
+	});
+};
+
 const addComponent = (component, spec) => (dispatch, getState) => {
 	dispatch({
 		type: "ADD_COMPONENT",
@@ -41,5 +49,6 @@ export default {
 	onResize: (value) => store.dispatch(setViewportRect(value)),
 	onDrag: (movement) => store.dispatch(moveViewport(movement)),
 	onDragComponent: (movement, idx) => store.dispatch(moveComponent(movement, idx)),
+	onSetComponentProps: (props, idx) => store.dispatch(setComponentProps(props, idx)),
 	onAddComponent: (component, pos) => store.dispatch(addComponent(component, pos))
 };

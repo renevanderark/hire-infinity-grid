@@ -119,6 +119,10 @@ class InfinityGrid extends React.Component {
 		this.setState({draggingComponent: idx});
 	}
 
+	changeComponentProps(idx, props) {
+		console.log(idx, props);
+		this.props.actions.onSetComponentProps(props, idx);
+	}
 
 	render() {
 		const [x, y, w, h] = this.props.viewBox;
@@ -148,6 +152,7 @@ class InfinityGrid extends React.Component {
 					<g key={i} transform={`translate(${component.x} ${component.y})`}>
 						<component.component
 							{...component.props}
+							onClick={component.props.onSelect.bind(this, i, component.props, (props) => this.changeComponentProps(i, props))}
 							onMouseDown={this.startComponentDrag.bind(this, i)}
 							onTouchStart={this.startComponentDrag.bind(this, i)}
 							style={{opacity: this.state.draggingComponent === i ? .5 : 1}}

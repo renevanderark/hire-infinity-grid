@@ -3181,6 +3181,16 @@ var moveComponent = function moveComponent(movement, idx) {
 	};
 };
 
+var setComponentProps = function setComponentProps(props, idx) {
+	return function (dispatch) {
+		dispatch({
+			type: "SET_COMPONENT_PROPS",
+			idx: idx,
+			props: props
+		});
+	};
+};
+
 var addComponent = function addComponent(component, spec) {
 	return function (dispatch, getState) {
 		dispatch({
@@ -3202,6 +3212,9 @@ exports["default"] = {
 	},
 	onDragComponent: function onDragComponent(movement, idx) {
 		return _store2["default"].dispatch(moveComponent(movement, idx));
+	},
+	onSetComponentProps: function onSetComponentProps(props, idx) {
+		return _store2["default"].dispatch(setComponentProps(props, idx));
 	},
 	onAddComponent: function onAddComponent(component, pos) {
 		return _store2["default"].dispatch(addComponent(component, pos));
@@ -3648,6 +3661,12 @@ var InfinityGrid = (function (_React$Component) {
 			this.setState({ draggingComponent: idx });
 		}
 	}, {
+		key: "changeComponentProps",
+		value: function changeComponentProps(idx, props) {
+			console.log(idx, props);
+			this.props.actions.onSetComponentProps(props, idx);
+		}
+	}, {
 		key: "render",
 		value: function render() {
 			var _this = this;
@@ -3686,6 +3705,9 @@ var InfinityGrid = (function (_React$Component) {
 						"g",
 						{ key: i, transform: "translate(" + component.x + " " + component.y + ")" },
 						_react2["default"].createElement(component.component, _extends({}, component.props, {
+							onClick: component.props.onSelect.bind(_this, i, component.props, function (props) {
+								return _this.changeComponentProps(i, props);
+							}),
 							onMouseDown: _this.startComponentDrag.bind(_this, i),
 							onTouchStart: _this.startComponentDrag.bind(_this, i),
 							style: { opacity: _this.state.draggingComponent === i ? .5 : 1 }
@@ -3770,6 +3792,7 @@ var initialState = {
 exports["default"] = function (state, action) {
 	if (state === undefined) state = initialState;
 
+	var idx = undefined;
 	switch (action.type) {
 		case "SET_VIEWBOX_RECT":
 			return _extends({}, state, { viewBox: action.viewBox, domPos: action.domPos
@@ -3784,7 +3807,7 @@ exports["default"] = function (state, action) {
 				}, (0, _cloneDeep2["default"])(state.components))
 			});
 		case "MOVE_COMPONENT":
-			var idx = action.idx;
+			idx = action.idx;
 			return _extends({}, state, {
 				components: (0, _utilSetIn2["default"])([idx], {
 					x: state.components[idx].x - action.movement.x,
@@ -3793,6 +3816,12 @@ exports["default"] = function (state, action) {
 					component: state.components[idx].component
 				}, (0, _cloneDeep2["default"])(state.components))
 			});
+		case "SET_COMPONENT_PROPS":
+			idx = action.idx;
+			return _extends({}, state, {
+				components: (0, _utilSetIn2["default"])([idx, "props"], _extends({}, state.components[idx].props, action.props), (0, _cloneDeep2["default"])(state.components))
+			});
+
 		default:
 			return state;
 	}
