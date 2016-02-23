@@ -15,12 +15,17 @@ import { InfinityGrid, draggable } from "infinity-grid";
 
 const Circle = draggable(
 	() => (<svg height="40" width="40"><g transform="translate(20 20)"><circle r="16" /></g></svg>), // Render while dragging
-	(props) => (<circle {...props} r="16" />) // Render dropped
+	(props) => (<circle {...props} />) // Render dropped
 );
 
 const Square = draggable(
 	() => (<svg height="40" width="40"><rect fill="rgb(0,0,0)" height="30" width="30" x="5" y="5"/></svg>), // Render while dragging
-	(props) => (<g transform="translate(-20 -20)"><rect {...props} fill="rgb(0,0,0)" height="30" width="30" x="5" y="5" /></g> ) // Render dropped
+	(props) => (<g transform="translate(-20 -20)"><rect {...props} fill={props.fill} height={props.size} width={props.size} x="5" y="5" /></g> ) // Render dropped
+);
+
+const Rect = draggable(
+	() => (<svg height="40" width="40"><rect fill="rgb(0,0,0)" height="10" width="30" x="5" y="5"/></svg>), // Render while dragging
+	(props) => (<g transform="translate(-20 -20)"><rect {...props} fill="rgb(0,0,0)" height="10" width="30" x="5" y="5" /></g> ) // Render dropped
 );
 
 class AppComponent extends React.Component {
@@ -29,8 +34,28 @@ class AppComponent extends React.Component {
 
 		return (
 			<div>
-				<div style={{"display": "inline-block"}}><Circle onClick={() => console.log("circle") } /></div>
-				<div style={{"display": "inline-block"}}><Square onClick={() => console.log("square") } /></div>
+
+				<div style={{"display": "inline-block"}}>
+					<Circle
+						fill="rgb(0,0,0)"
+						onDeselect={(idx, props, setProps) => setProps({r: 16, fill: "rgb(0,0,0)"}) }
+						onSelect={(idx, props, setProps) => setProps({r: 20, fill: "rgb(0,0,255)"}) }
+						r="16"
+						/>
+				</div>
+
+				<div style={{"display": "inline-block"}}>
+					<Square
+						fill="rgb(0,0,0)"
+						onDeselect={(idx, props, setProps) => setProps({size: 30, fill: "rgb(0,0,0)"}) }
+						onSelect={(idx, props, setProps) => setProps({size: 40, fill: "rgb(0,0,255)"}) }
+						size="30" />
+				</div>
+
+				<div style={{"display": "inline-block"}}>
+					<Rect onSelect={(idx, props, setProps) => setProps({deleted: true}) } size="30" />
+				</div>
+
 				<div style={{width: "100%", height: "500px"}}>
 					<InfinityGrid />
 				</div>
