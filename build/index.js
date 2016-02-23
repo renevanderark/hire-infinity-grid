@@ -3191,6 +3191,31 @@ var setComponentProps = function setComponentProps(props, idx) {
 	};
 };
 
+var selectComponent = function selectComponent(idx, next) {
+	return function (dispatch, getState) {
+		var unsubscribe = _store2["default"].subscribe(function () {
+			unsubscribe();
+			next();
+		});
+
+		var sel = getState().grid.components.map(function (c, i) {
+			return [c, i];
+		}).filter(function (cc) {
+			return cc[0].props.selected && !cc[0].props.deleted;
+		});
+		if (sel.length) {
+			sel[0][0].props.onDeselect(sel[0][1], sel[0][0].props, function (props) {
+				_store2["default"].dispatch(setComponentProps(props, sel[0][1]));
+			});
+		}
+
+		dispatch({
+			type: "SELECT_COMPONENT",
+			idx: idx
+		});
+	};
+};
+
 var addComponent = function addComponent(component, spec) {
 	return function (dispatch, getState) {
 		dispatch({
@@ -3218,6 +3243,9 @@ exports["default"] = {
 	},
 	onAddComponent: function onAddComponent(component, pos) {
 		return _store2["default"].dispatch(addComponent(component, pos));
+	},
+	onSelectComponent: function onSelectComponent(idx, next) {
+		return _store2["default"].dispatch(selectComponent(idx, next));
 	}
 };
 module.exports = exports["default"];
@@ -3627,6 +3655,9 @@ var InfinityGrid = (function (_React$Component) {
 				case MOUSE_DOWN:
 					return this.props.actions.onDrag(this.movement);
 				case COMPONENT_DOWN:
+					if (this.state.draggingComponent === -1) {
+						this.setState({ draggingComponent: this.componentIndex });
+					}
 					return this.props.actions.onDragComponent(this.movement, this.state.draggingComponent);
 				default:
 			}
@@ -3658,18 +3689,30 @@ var InfinityGrid = (function (_React$Component) {
 		key: "startComponentDrag",
 		value: function startComponentDrag(idx) {
 			this.mouseState = COMPONENT_DOWN;
-			this.setState({ draggingComponent: idx });
+			this.componentIndex = idx;
 		}
 	}, {
 		key: "changeComponentProps",
 		value: function changeComponentProps(idx, props) {
-			console.log(idx, props);
 			this.props.actions.onSetComponentProps(props, idx);
+		}
+	}, {
+		key: "onComponentClick",
+		value: function onComponentClick(idx, component) {
+			var _this = this;
+
+			if (this.state.draggingComponent === -1) {
+				this.props.actions.onSelectComponent(idx, function () {
+					component.props.onSelect(idx, component.props, function (props) {
+						return _this.changeComponentProps(idx, props);
+					});
+				});
+			}
 		}
 	}, {
 		key: "render",
 		value: function render() {
-			var _this = this;
+			var _this2 = this;
 
 			var _props$viewBox = _slicedToArray(this.props.viewBox, 4);
 
@@ -3714,12 +3757,10 @@ var InfinityGrid = (function (_React$Component) {
 						"g",
 						{ key: i, transform: "translate(" + component.x + " " + component.y + ")" },
 						_react2["default"].createElement(component.component, _extends({}, component.props, {
-							onClick: component.props.onSelect.bind(_this, i, component.props, function (props) {
-								return _this.changeComponentProps(i, props);
-							}),
-							onMouseDown: _this.startComponentDrag.bind(_this, i),
-							onTouchStart: _this.startComponentDrag.bind(_this, i),
-							style: { opacity: _this.state.draggingComponent === i ? .5 : 1 }
+							onMouseDown: _this2.startComponentDrag.bind(_this2, i),
+							onMouseUp: _this2.onComponentClick.bind(_this2, i, component),
+							onTouchStart: _this2.startComponentDrag.bind(_this2, i),
+							style: { opacity: _this2.state.draggingComponent === i ? .5 : 1 }
 						}))
 					);
 				})
@@ -3831,6 +3872,14 @@ exports["default"] = function (state, action) {
 				components: (0, _utilSetIn2["default"])([idx, "props"], _extends({}, state.components[idx].props, action.props), (0, _cloneDeep2["default"])(state.components))
 			});
 
+		case "SELECT_COMPONENT":
+			idx = action.idx;
+
+			return _extends({}, state, {
+				components: (0, _cloneDeep2["default"])(state.components).map(function (c, i) {
+					return _extends({}, c, { props: _extends({}, c.props, { selected: i === idx }) });
+				})
+			});
 		default:
 			return state;
 	}

@@ -89,6 +89,9 @@ class InfinityGrid extends React.Component {
 			case MOUSE_DOWN:
 				return this.props.actions.onDrag(this.movement);
 			case COMPONENT_DOWN:
+				if(this.state.draggingComponent === -1) {
+					this.setState({draggingComponent: this.componentIndex});
+				}
 				return this.props.actions.onDragComponent(this.movement, this.state.draggingComponent);
 			default:
 		}
@@ -116,12 +119,19 @@ class InfinityGrid extends React.Component {
 
 	startComponentDrag(idx) {
 		this.mouseState = COMPONENT_DOWN;
-		this.setState({draggingComponent: idx});
+		this.componentIndex = idx;
 	}
 
 	changeComponentProps(idx, props) {
-		console.log(idx, props);
 		this.props.actions.onSetComponentProps(props, idx);
+	}
+
+	onComponentClick(idx, component) {
+		if(this.state.draggingComponent === -1) {
+			this.props.actions.onSelectComponent(idx, () => {
+				component.props.onSelect(idx, component.props, (props) => this.changeComponentProps(idx, props));
+			});
+		}
 	}
 
 	render() {
@@ -154,8 +164,8 @@ class InfinityGrid extends React.Component {
 						<g key={i} transform={`translate(${component.x} ${component.y})`}>
 							<component.component
 								{...component.props}
-								onClick={component.props.onSelect.bind(this, i, component.props, (props) => this.changeComponentProps(i, props))}
 								onMouseDown={this.startComponentDrag.bind(this, i)}
+								onMouseUp={this.onComponentClick.bind(this, i, component)}
 								onTouchStart={this.startComponentDrag.bind(this, i)}
 								style={{opacity: this.state.draggingComponent === i ? .5 : 1}}
 							/>

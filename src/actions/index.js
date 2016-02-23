@@ -35,6 +35,25 @@ const setComponentProps = (props, idx) => (dispatch) => {
 	});
 };
 
+const selectComponent = (idx, next) => (dispatch, getState) => {
+	const unsubscribe = store.subscribe(() => {
+		unsubscribe();
+		next();
+	});
+
+	const sel = getState().grid.components.map((c, i) => [c, i]).filter((cc) => cc[0].props.selected && !cc[0].props.deleted );
+	if(sel.length) {
+		sel[0][0].props.onDeselect(sel[0][1], sel[0][0].props, (props) => {
+			store.dispatch(setComponentProps(props, sel[0][1]));
+		});
+	}
+
+	dispatch({
+		type: "SELECT_COMPONENT",
+		idx: idx
+	});
+};
+
 const addComponent = (component, spec) => (dispatch, getState) => {
 	dispatch({
 		type: "ADD_COMPONENT",
@@ -50,5 +69,6 @@ export default {
 	onDrag: (movement) => store.dispatch(moveViewport(movement)),
 	onDragComponent: (movement, idx) => store.dispatch(moveComponent(movement, idx)),
 	onSetComponentProps: (props, idx) => store.dispatch(setComponentProps(props, idx)),
-	onAddComponent: (component, pos) => store.dispatch(addComponent(component, pos))
+	onAddComponent: (component, pos) => store.dispatch(addComponent(component, pos)),
+	onSelectComponent: (idx, next) => store.dispatch(selectComponent(idx, next))
 };

@@ -46,6 +46,15 @@ export default function(state=initialState, action) {
 				}, clone(state.components))
 			};
 
+		case "SELECT_COMPONENT":
+			idx = action.idx;
+
+			return {
+				...state,
+				components: clone(state.components).map((c, i) => {
+					return {...c, props: {...c.props, selected: i === idx}};
+				})
+			};
 		default:
 			return state;
 	}
