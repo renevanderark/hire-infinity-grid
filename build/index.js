@@ -3701,6 +3701,15 @@ var InfinityGrid = (function (_React$Component) {
 					return _react2["default"].createElement("line", { key: "y-" + i, stroke: "rgb(196,196,196)", x1: x, x2: x + w, y1: val, y2: val });
 				}),
 				this.props.components.map(function (component, i) {
+					return [component, i];
+				}).filter(function (c) {
+					return !c[0].props.deleted;
+				}).map(function (c) {
+					var _c = _slicedToArray(c, 2);
+
+					var component = _c[0];
+					var i = _c[1];
+
 					return _react2["default"].createElement(
 						"g",
 						{ key: i, transform: "translate(" + component.x + " " + component.y + ")" },

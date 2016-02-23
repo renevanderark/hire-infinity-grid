@@ -148,17 +148,20 @@ class InfinityGrid extends React.Component {
 					<line key={`y-${i}`} stroke="rgb(196,196,196)" x1={x} x2={x + w} y1={val} y2={val} />
 				)}
 
-				{this.props.components.map((component, i) => (
-					<g key={i} transform={`translate(${component.x} ${component.y})`}>
-						<component.component
-							{...component.props}
-							onClick={component.props.onSelect.bind(this, i, component.props, (props) => this.changeComponentProps(i, props))}
-							onMouseDown={this.startComponentDrag.bind(this, i)}
-							onTouchStart={this.startComponentDrag.bind(this, i)}
-							style={{opacity: this.state.draggingComponent === i ? .5 : 1}}
-						/>
-					</g>
-				))}
+				{this.props.components.map((component, i) => [component, i]).filter((c) => !c[0].props.deleted).map((c) => {
+					const [component, i] = c;
+					return (
+						<g key={i} transform={`translate(${component.x} ${component.y})`}>
+							<component.component
+								{...component.props}
+								onClick={component.props.onSelect.bind(this, i, component.props, (props) => this.changeComponentProps(i, props))}
+								onMouseDown={this.startComponentDrag.bind(this, i)}
+								onTouchStart={this.startComponentDrag.bind(this, i)}
+								style={{opacity: this.state.draggingComponent === i ? .5 : 1}}
+							/>
+						</g>
+					);
+				})}
 			</svg>
 		);
 	}
