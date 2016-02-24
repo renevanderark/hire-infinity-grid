@@ -3191,11 +3191,11 @@ var setComponentProps = function setComponentProps(props, idx) {
 	};
 };
 
-var selectComponent = function selectComponent(idx, next) {
+var selectComponent = function selectComponent(idx) {
 	return function (dispatch, getState) {
 		var unsubscribe = _store2["default"].subscribe(function () {
 			unsubscribe();
-			next();
+			getState().grid.components[idx].props.onSelect(idx, getState().grid.components[idx].props);
 		});
 
 		var sel = getState().grid.components.map(function (c, i) {
@@ -3218,6 +3218,11 @@ var selectComponent = function selectComponent(idx, next) {
 
 var addComponent = function addComponent(component, spec) {
 	return function (dispatch, getState) {
+		var unsubscribe = _store2["default"].subscribe(function () {
+			unsubscribe();
+			_store2["default"].dispatch(selectComponent(getState().grid.components.length - 1));
+		});
+
 		dispatch({
 			type: "ADD_COMPONENT",
 			x: getState().grid.viewBox[0] + spec.x,
@@ -3700,21 +3705,15 @@ var InfinityGrid = (function (_React$Component) {
 		}
 	}, {
 		key: "onComponentClick",
-		value: function onComponentClick(idx, component) {
-			var _this = this;
-
+		value: function onComponentClick(idx) {
 			if (this.state.draggingComponent === -1) {
-				this.props.actions.onSelectComponent(idx, function () {
-					component.props.onSelect(idx, component.props, function (props) {
-						return _this.changeComponentProps(idx, props);
-					});
-				});
+				this.props.actions.onSelectComponent(idx);
 			}
 		}
 	}, {
 		key: "render",
 		value: function render() {
-			var _this2 = this;
+			var _this = this;
 
 			var _props$viewBox = _slicedToArray(this.props.viewBox, 4);
 
@@ -3760,10 +3759,10 @@ var InfinityGrid = (function (_React$Component) {
 						{ key: i, transform: "translate(" + component.x + " " + component.y + ")" },
 						_react2["default"].createElement(component.component, _extends({}, component.props, {
 							componentIndex: i,
-							onMouseDown: _this2.startComponentDrag.bind(_this2, i),
-							onMouseUp: _this2.onComponentClick.bind(_this2, i, component),
-							onTouchStart: _this2.startComponentDrag.bind(_this2, i),
-							style: { opacity: _this2.state.draggingComponent === i ? .5 : 1 }
+							onMouseDown: _this.startComponentDrag.bind(_this, i),
+							onMouseUp: _this.onComponentClick.bind(_this, i),
+							onTouchStart: _this.startComponentDrag.bind(_this, i),
+							style: { opacity: _this.state.draggingComponent === i ? .5 : 1 }
 						}))
 					);
 				})
