@@ -3865,6 +3865,9 @@ exports["default"] = function (state, action) {
 			});
 		case "MOVE_COMPONENT":
 			idx = action.idx;
+			if (typeof state.components[idx] === "undefined") {
+				return state;
+			}
 			return _extends({}, state, {
 				components: (0, _utilSetIn2["default"])([idx], {
 					x: state.components[idx].x - action.movement.x,

@@ -27,6 +27,7 @@ export default function(state=initialState, action) {
 			};
 		case "MOVE_COMPONENT":
 			idx = action.idx;
+			if(typeof state.components[idx] === "undefined") { return state; }
 			return {
 				...state,
 				components: setIn([idx], {
