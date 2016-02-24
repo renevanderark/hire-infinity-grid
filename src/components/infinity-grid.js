@@ -128,7 +128,7 @@ class InfinityGrid extends React.Component {
 		this.props.actions.onSetComponentProps(props, idx);
 	}
 
-	onComponentClick(idx, component, ev) {
+	onComponentClick(idx, component) {
 		if(this.state.draggingComponent === -1) {
 			this.props.actions.onSelectComponent(idx, () => {
 				component.props.onSelect(idx, component.props, (props) => this.changeComponentProps(idx, props));
@@ -166,6 +166,7 @@ class InfinityGrid extends React.Component {
 						<g key={i} transform={`translate(${component.x} ${component.y})`}>
 							<component.component
 								{...component.props}
+								componentIndex={i}
 								onMouseDown={this.startComponentDrag.bind(this, i)}
 								onMouseUp={this.onComponentClick.bind(this, i, component)}
 								onTouchStart={this.startComponentDrag.bind(this, i)}

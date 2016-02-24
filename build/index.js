@@ -3700,7 +3700,7 @@ var InfinityGrid = (function (_React$Component) {
 		}
 	}, {
 		key: "onComponentClick",
-		value: function onComponentClick(idx, component, ev) {
+		value: function onComponentClick(idx, component) {
 			var _this = this;
 
 			if (this.state.draggingComponent === -1) {
@@ -3759,6 +3759,7 @@ var InfinityGrid = (function (_React$Component) {
 						"g",
 						{ key: i, transform: "translate(" + component.x + " " + component.y + ")" },
 						_react2["default"].createElement(component.component, _extends({}, component.props, {
+							componentIndex: i,
 							onMouseDown: _this2.startComponentDrag.bind(_this2, i),
 							onMouseUp: _this2.onComponentClick.bind(_this2, i, component),
 							onTouchStart: _this2.startComponentDrag.bind(_this2, i),
@@ -3808,14 +3809,19 @@ var _components = _dereq_("./components");
 
 var _components2 = _interopRequireDefault(_components);
 
+var _actions = _dereq_("./actions");
+
+var _actions2 = _interopRequireDefault(_actions);
+
 var _componentsDraggable = _dereq_("./components/draggable");
 
 var _componentsDraggable2 = _interopRequireDefault(_componentsDraggable);
 
 exports.InfinityGrid = _components2["default"];
 exports.draggable = _componentsDraggable2["default"];
+exports.actions = _actions2["default"];
 
-},{"./components":35,"./components/draggable":33}],39:[function(_dereq_,module,exports){
+},{"./actions":32,"./components":35,"./components/draggable":33}],39:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
