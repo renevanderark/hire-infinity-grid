@@ -27,7 +27,7 @@ export default (DragComponent, DropComponent) => {
 		render() {
 			return (this.props.isDragging ?
 							this.props.dragPreview(<div key="drag" ><DraggingComponent /></div>) :
-							this.props.dragSource(<div><DragComponent /></div>));
+							this.props.dragSource(<div><DragComponent {...this.props} /></div>));
 		}
 	}
 
