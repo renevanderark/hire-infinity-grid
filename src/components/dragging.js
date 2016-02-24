@@ -40,7 +40,7 @@ export default (DragComponent) => {
 			return (
 				<div style={layerStyles}>
 					<div style={getItemStyles(this.props)}>
-						<DragComponent />
+						<DragComponent {...this.props} />
 					</div>
 				</div>
 			);

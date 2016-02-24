@@ -26,7 +26,7 @@ export default (DragComponent, DropComponent) => {
 	class Draggable extends React.Component {
 		render() {
 			return (this.props.isDragging ?
-							this.props.dragPreview(<div key="drag" ><DraggingComponent /></div>) :
+							this.props.dragPreview(<div key="drag" ><DraggingComponent {...this.props} /></div>) :
 							this.props.dragSource(<div><DragComponent {...this.props} /></div>));
 		}
 	}

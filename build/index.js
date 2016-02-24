@@ -3311,11 +3311,10 @@ exports["default"] = function (DragComponent, DropComponent) {
 		_createClass(Draggable, [{
 			key: "render",
 			value: function render() {
-				console.log(this.props);
 				return this.props.isDragging ? this.props.dragPreview(_react2["default"].createElement(
 					"div",
 					{ key: "drag" },
-					_react2["default"].createElement(DraggingComponent, null)
+					_react2["default"].createElement(DraggingComponent, this.props)
 				)) : this.props.dragSource(_react2["default"].createElement(
 					"div",
 					null,
@@ -3421,7 +3420,7 @@ exports["default"] = function (DragComponent) {
 					_react2["default"].createElement(
 						"div",
 						{ style: getItemStyles(this.props) },
-						_react2["default"].createElement(DragComponent, null)
+						_react2["default"].createElement(DragComponent, this.props)
 					)
 				);
 			}
