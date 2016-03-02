@@ -1,6 +1,6 @@
 {
-  "name": "infinity-grid",
-  "version": "0.0.0",
+  "name": "hire-infinity-grid",
+  "version": "1.0.0",
   "main": "build/index.js",
   "author": {
     "name": "René van der Ark",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/renevanderark/hire-infinity-grid.git"
   },
   "scripts": {
     "start": "scripts/watch.sh"
