@@ -14,7 +14,6 @@
     "start": "scripts/watch.sh"
   },
   "dependencies": {
-    "clone-deep": "^0.2.4",
     "redux": "^3.2.1",
     "redux-thunk": "^1.0.3"
   },
