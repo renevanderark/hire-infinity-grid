@@ -68,10 +68,12 @@ class InfinityGrid extends React.Component {
 		this.mousePos.y = ev.clientY;
 		this.movement = {x: 0, y: 0};
 		this.mouseState = this.mouseState === COMPONENT_DOWN ? COMPONENT_DOWN : MOUSE_DOWN;
+		return ev.preventDefault();
 	}
 
 	onTouchStart(ev) {
 		this.onMouseDown({clientX: ev.touches[0].pageX, clientY: ev.touches[0].pageY});
+		return ev.preventDefault();
 	}
 
 	onTouchMove(ev) {

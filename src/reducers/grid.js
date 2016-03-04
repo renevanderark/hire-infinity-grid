@@ -1,5 +1,5 @@
-import clone from "clone-deep";
 import setIn from "./util/set-in";
+import clone from "./util/clone-deep";
 
 let initialState = {
 	viewBox: [0, 0, 0, 0],
@@ -23,7 +23,7 @@ export default function(state=initialState, action) {
 					y: action.y,
 					props: action.props,
 					component: action.component
-				}, clone(state.components))
+				}, state.components)
 			};
 		case "MOVE_COMPONENT":
 			idx = action.idx;
@@ -35,7 +35,7 @@ export default function(state=initialState, action) {
 					y: state.components[idx].y - action.movement.y,
 					props: state.components[idx].props,
 					component: state.components[idx].component
-				}, clone(state.components))
+				}, state.components)
 			};
 		case "SET_COMPONENT_PROPS":
 			idx = action.idx;
@@ -44,7 +44,7 @@ export default function(state=initialState, action) {
 				components: setIn([idx, "props"], {
 					...state.components[idx].props,
 					...action.props
-				}, clone(state.components))
+				}, state.components)
 			};
 
 		case "SELECT_COMPONENT":
