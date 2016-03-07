@@ -17,10 +17,19 @@ const range = (begin, amount, interval = 1) => {
 
 const target = {
 	drop(props, monitor) {
+		console.log(props);
 		const {x, y} = monitor.getClientOffset();
-		props.actions.onAddComponent(monitor.getItem().dropComponent, {
+		if(monitor.getItem().props.onDrop) {
+			monitor.getItem().props.onDrop({
+				x: props.viewBox[0] + x - props.domPos.x,
+				y: props.viewBox[1] + y - props.domPos.y,
+				props: monitor.getItem().props
+			});
+		}
+/*		props.actions.onAddComponent(monitor.getItem().dropComponent, {
 			x: x - props.domPos.x, y: y - props.domPos.y, props: monitor.getItem().props
 		});
+*/
 	}
 };
 
@@ -94,7 +103,7 @@ class InfinityGrid extends React.Component {
 				if(this.state.draggingComponent === -1) {
 					this.setState({draggingComponent: this.componentIndex});
 				}
-				return this.props.actions.onDragComponent(this.movement, this.state.draggingComponent);
+				return this.props.children[this.componentIndex].props.onDrag(this.movement);
 			default:
 		}
 	}
@@ -130,11 +139,6 @@ class InfinityGrid extends React.Component {
 		this.props.actions.onSetComponentProps(props, idx);
 	}
 
-	onComponentClick(idx) {
-		if(this.state.draggingComponent === -1) {
-			this.props.actions.onSelectComponent(idx);
-		}
-	}
 
 	render() {
 		const [x, y, w, h] = this.props.viewBox;
@@ -160,21 +164,11 @@ class InfinityGrid extends React.Component {
 					<line key={`y-${i}`} stroke="rgb(196,196,196)" x1={x} x2={x + w} y1={val} y2={val} />
 				)}
 
-				{this.props.components.map((component, i) => [component, i]).filter((c) => !c[0].props.deleted).map((c) => {
-					const [component, i] = c;
-					return (
-						<g key={i} transform={`translate(${component.x} ${component.y})`}>
-							<component.component
-								{...component.props}
-								componentIndex={i}
-								onMouseDown={this.startComponentDrag.bind(this, i)}
-								onMouseUp={this.onComponentClick.bind(this, i)}
-								onTouchStart={this.startComponentDrag.bind(this, i)}
-								style={{opacity: this.state.draggingComponent === i ? .5 : 1}}
-							/>
-						</g>
-					);
-				})}
+				{React.Children.map(this.props.children, (childComponent, i) => (
+					<g key={i} onMouseDown={this.startComponentDrag.bind(this, i)} onTouchStart={this.startComponentDrag.bind(this, i)}>
+						{childComponent}
+					</g>
+				))}
 			</svg>
 		);
 	}
@@ -182,6 +176,7 @@ class InfinityGrid extends React.Component {
 
 InfinityGrid.propTypes = {
 	actions: React.PropTypes.object,
+	children: React.PropTypes.node,
 	components: React.PropTypes.array,
 	connectDropTarget: React.PropTypes.func,
 	gridSize: React.PropTypes.number,

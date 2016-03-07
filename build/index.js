@@ -936,13 +936,12 @@ var _reactDnd = _dereq_("react-dnd");
 
 var _types = _dereq_("./types");
 
-exports["default"] = function (DragComponent, DropComponent) {
+exports["default"] = function (DragComponent) {
 	var DraggingComponent = (0, _dragging2["default"])(DragComponent);
 
 	var componentSource = {
 		beginDrag: function beginDrag(props) {
 			return {
-				dropComponent: DropComponent,
 				props: props
 			};
 		}
@@ -1162,7 +1161,7 @@ var App = (function (_React$Component) {
 			return _react2["default"].createElement(
 				"div",
 				{ style: { width: "100%", height: "100%" } },
-				_react2["default"].createElement(_infinityGrid2["default"], _extends({}, this.state.grid, { actions: _actions2["default"] }))
+				_react2["default"].createElement(_infinityGrid2["default"], _extends({}, this.props, this.state.grid, { actions: _actions2["default"] }))
 			);
 		}
 	}]);
@@ -1179,8 +1178,6 @@ module.exports = exports["default"];
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
@@ -1224,14 +1221,24 @@ var range = function range(begin, amount) {
 
 var target = {
 	drop: function drop(props, monitor) {
+		console.log(props);
+
 		var _monitor$getClientOffset = monitor.getClientOffset();
 
 		var x = _monitor$getClientOffset.x;
 		var y = _monitor$getClientOffset.y;
 
-		props.actions.onAddComponent(monitor.getItem().dropComponent, {
-			x: x - props.domPos.x, y: y - props.domPos.y, props: monitor.getItem().props
-		});
+		if (monitor.getItem().props.onDrop) {
+			monitor.getItem().props.onDrop({
+				x: props.viewBox[0] + x - props.domPos.x,
+				y: props.viewBox[1] + y - props.domPos.y,
+				props: monitor.getItem().props
+			});
+		}
+		/*		props.actions.onAddComponent(monitor.getItem().dropComponent, {
+  			x: x - props.domPos.x, y: y - props.domPos.y, props: monitor.getItem().props
+  		});
+  */
 	}
 };
 
@@ -1317,7 +1324,7 @@ var InfinityGrid = (function (_React$Component) {
 					if (this.state.draggingComponent === -1) {
 						this.setState({ draggingComponent: this.componentIndex });
 					}
-					return this.props.actions.onDragComponent(this.movement, this.state.draggingComponent);
+					return this.props.children[this.componentIndex].props.onDrag(this.movement);
 				default:
 			}
 		}
@@ -1358,13 +1365,6 @@ var InfinityGrid = (function (_React$Component) {
 			this.props.actions.onSetComponentProps(props, idx);
 		}
 	}, {
-		key: "onComponentClick",
-		value: function onComponentClick(idx) {
-			if (this.state.draggingComponent === -1) {
-				this.props.actions.onSelectComponent(idx);
-			}
-		}
-	}, {
 		key: "render",
 		value: function render() {
 			var _this = this;
@@ -1398,26 +1398,11 @@ var InfinityGrid = (function (_React$Component) {
 				range(this.props.gridSize - y % this.props.gridSize + y - this.props.gridSize, h + this.props.gridSize, this.props.gridSize).map(function (val, i) {
 					return _react2["default"].createElement("line", { key: "y-" + i, stroke: "rgb(196,196,196)", x1: x, x2: x + w, y1: val, y2: val });
 				}),
-				this.props.components.map(function (component, i) {
-					return [component, i];
-				}).filter(function (c) {
-					return !c[0].props.deleted;
-				}).map(function (c) {
-					var _c = _slicedToArray(c, 2);
-
-					var component = _c[0];
-					var i = _c[1];
-
+				_react2["default"].Children.map(this.props.children, function (childComponent, i) {
 					return _react2["default"].createElement(
 						"g",
-						{ key: i, transform: "translate(" + component.x + " " + component.y + ")" },
-						_react2["default"].createElement(component.component, _extends({}, component.props, {
-							componentIndex: i,
-							onMouseDown: _this.startComponentDrag.bind(_this, i),
-							onMouseUp: _this.onComponentClick.bind(_this, i),
-							onTouchStart: _this.startComponentDrag.bind(_this, i),
-							style: { opacity: _this.state.draggingComponent === i ? .5 : 1 }
-						}))
+						{ key: i, onMouseDown: _this.startComponentDrag.bind(_this, i), onTouchStart: _this.startComponentDrag.bind(_this, i) },
+						childComponent
 					);
 				})
 			));
@@ -1429,6 +1414,7 @@ var InfinityGrid = (function (_React$Component) {
 
 InfinityGrid.propTypes = {
 	actions: _react2["default"].PropTypes.object,
+	children: _react2["default"].PropTypes.node,
 	components: _react2["default"].PropTypes.array,
 	connectDropTarget: _react2["default"].PropTypes.func,
 	gridSize: _react2["default"].PropTypes.number,
