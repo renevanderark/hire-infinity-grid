@@ -17,7 +17,6 @@ const range = (begin, amount, interval = 1) => {
 
 const target = {
 	drop(props, monitor) {
-		console.log(props);
 		const {x, y} = monitor.getClientOffset();
 		if(monitor.getItem().props.onDrop) {
 			monitor.getItem().props.onDrop({
@@ -26,10 +25,6 @@ const target = {
 				props: monitor.getItem().props
 			});
 		}
-/*		props.actions.onAddComponent(monitor.getItem().dropComponent, {
-			x: x - props.domPos.x, y: y - props.domPos.y, props: monitor.getItem().props
-		});
-*/
 	}
 };
 
@@ -135,13 +130,16 @@ class InfinityGrid extends React.Component {
 		}
 	}
 
-	changeComponentProps(idx, props) {
-		this.props.actions.onSetComponentProps(props, idx);
-	}
-
-
 	render() {
 		const [x, y, w, h] = this.props.viewBox;
+
+		const gridLines = this.props.gridSize ? [
+			range(this.props.gridSize - (x % this.props.gridSize) + x - this.props.gridSize, w + this.props.gridSize, this.props.gridSize).map((val, i) =>
+				(<line key={`x-${i}`} stroke="rgb(196,196,196)" x1={val} x2={val} y1={y} y2={y + h} />)),
+			range(this.props.gridSize - (y % this.props.gridSize) + y - this.props.gridSize, h + this.props.gridSize, this.props.gridSize).map((val, i) =>
+				(<line key={`y-${i}`} stroke="rgb(196,196,196)" x1={x} x2={x + w} y1={val} y2={val} />))
+			] : [null, null];
+
 		return this.props.connectDropTarget(
 			<svg id="grid-svg"
 				onDragStart={(ev) => ev.preventDefault()}
@@ -155,14 +153,8 @@ class InfinityGrid extends React.Component {
 					height: (this.props.viewBox[3] + 2) + "px"
 				}}
 				viewBox={this.props.viewBox.join(" ")}>
-
-				{range(this.props.gridSize - (x % this.props.gridSize) + x - this.props.gridSize, w + this.props.gridSize, this.props.gridSize).map((val, i) =>
-					<line key={`x-${i}`} stroke="rgb(196,196,196)" x1={val} x2={val} y1={y} y2={y + h} />
-				)}
-
-				{range(this.props.gridSize - (y % this.props.gridSize) + y - this.props.gridSize, h + this.props.gridSize, this.props.gridSize).map((val, i) =>
-					<line key={`y-${i}`} stroke="rgb(196,196,196)" x1={x} x2={x + w} y1={val} y2={val} />
-				)}
+				{gridLines[0]}
+				{gridLines[1]}
 
 				{React.Children.map(this.props.children, (childComponent, i) => (
 					<g key={i} onMouseDown={this.startComponentDrag.bind(this, i)} onTouchStart={this.startComponentDrag.bind(this, i)}>
