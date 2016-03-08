@@ -24,3 +24,5 @@ export default {
 	onResize: (value) => store.dispatch(setViewportRect(value)),
 	onDrag: (movement) => store.dispatch(moveViewport(movement))
 };
+
+export { setViewportRect, moveViewport };

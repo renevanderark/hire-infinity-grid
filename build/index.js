@@ -831,7 +831,8 @@ exports["default"] = {
 		return _store2["default"].dispatch(moveViewport(movement));
 	}
 };
-module.exports = exports["default"];
+exports.setViewportRect = setViewportRect;
+exports.moveViewport = moveViewport;
 
 },{"../store":22}],14:[function(_dereq_,module,exports){
 "use strict";
