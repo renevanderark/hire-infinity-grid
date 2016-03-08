@@ -804,7 +804,7 @@ var setViewportRect = function setViewportRect(rect) {
 	return function (dispatch, getState) {
 		dispatch({
 			type: "SET_VIEWBOX_RECT",
-			viewBox: [getState().grid.viewBox[0], getState().grid.viewBox[1], Math.floor(rect.width) - 2, Math.floor(rect.height) - 2],
+			viewBox: [getState().grid.viewBox[0], getState().grid.viewBox[1], Math.floor(rect.width), Math.floor(rect.height)],
 			domPos: { x: rect.left, y: rect.top }
 		});
 	};
