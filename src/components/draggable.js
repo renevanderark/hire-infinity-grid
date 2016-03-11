@@ -3,13 +3,12 @@ import dragging from "./dragging";
 import { DragSource } from "react-dnd";
 import { GRID_ITEM } from "./types";
 
-export default (DragComponent, DropComponent) => {
+export default (DragComponent) => {
 	const DraggingComponent = dragging(DragComponent);
 
 	const componentSource = {
 		beginDrag: (props) => {
 			return {
-				dropComponent: DropComponent,
 				props: props
 			};
 		}
