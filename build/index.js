@@ -804,7 +804,7 @@ var setViewportRect = function setViewportRect(rect) {
 	return function (dispatch, getState) {
 		dispatch({
 			type: "SET_VIEWBOX_RECT",
-			viewBox: [getState().grid.viewBox[0], getState().grid.viewBox[1], Math.floor(rect.width) - 2, Math.floor(rect.height) - 2],
+			viewBox: [getState().grid.viewBox[0], getState().grid.viewBox[1], Math.floor(rect.width), Math.floor(rect.height)],
 			domPos: { x: rect.left, y: rect.top }
 		});
 	};
@@ -823,91 +823,18 @@ var moveViewport = function moveViewport(movement) {
 	};
 };
 
-var moveComponent = function moveComponent(movement, idx) {
-	return function (dispatch) {
-		dispatch({
-			type: "MOVE_COMPONENT",
-			movement: movement,
-			idx: idx
-		});
-	};
-};
-
-var setComponentProps = function setComponentProps(props, idx) {
-	return function (dispatch) {
-		dispatch({
-			type: "SET_COMPONENT_PROPS",
-			idx: idx,
-			props: props
-		});
-	};
-};
-
-var selectComponent = function selectComponent(idx) {
-	return function (dispatch, getState) {
-		var unsubscribe = _store2["default"].subscribe(function () {
-			unsubscribe();
-			getState().grid.components[idx].props.onSelect(idx, getState().grid.components[idx].props);
-		});
-
-		var sel = getState().grid.components.map(function (c, i) {
-			return [c, i];
-		}).filter(function (cc) {
-			return cc[0].props.selected && !cc[0].props.deleted;
-		});
-		if (sel.length) {
-			sel[0][0].props.onDeselect(sel[0][1], sel[0][0].props, function (props) {
-				_store2["default"].dispatch(setComponentProps(props, sel[0][1]));
-			});
-		}
-
-		dispatch({
-			type: "SELECT_COMPONENT",
-			idx: idx
-		});
-	};
-};
-
-var addComponent = function addComponent(component, spec) {
-	return function (dispatch, getState) {
-		var unsubscribe = _store2["default"].subscribe(function () {
-			unsubscribe();
-			_store2["default"].dispatch(selectComponent(getState().grid.components.length - 1));
-		});
-
-		dispatch({
-			type: "ADD_COMPONENT",
-			x: getState().grid.viewBox[0] + spec.x,
-			y: getState().grid.viewBox[1] + spec.y,
-			props: spec.props,
-			component: component
-		});
-	};
-};
-
 exports["default"] = {
 	onResize: function onResize(value) {
 		return _store2["default"].dispatch(setViewportRect(value));
 	},
 	onDrag: function onDrag(movement) {
 		return _store2["default"].dispatch(moveViewport(movement));
-	},
-	onDragComponent: function onDragComponent(movement, idx) {
-		return _store2["default"].dispatch(moveComponent(movement, idx));
-	},
-	onSetComponentProps: function onSetComponentProps(props, idx) {
-		return _store2["default"].dispatch(setComponentProps(props, idx));
-	},
-	onAddComponent: function onAddComponent(component, pos) {
-		return _store2["default"].dispatch(addComponent(component, pos));
-	},
-	onSelectComponent: function onSelectComponent(idx, next) {
-		return _store2["default"].dispatch(selectComponent(idx, next));
 	}
 };
-module.exports = exports["default"];
+exports.setViewportRect = setViewportRect;
+exports.moveViewport = moveViewport;
 
-},{"../store":24}],14:[function(_dereq_,module,exports){
+},{"../store":22}],14:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -936,13 +863,12 @@ var _reactDnd = _dereq_("react-dnd");
 
 var _types = _dereq_("./types");
 
-exports["default"] = function (DragComponent, DropComponent) {
+exports["default"] = function (DragComponent) {
 	var DraggingComponent = (0, _dragging2["default"])(DragComponent);
 
 	var componentSource = {
 		beginDrag: function beginDrag(props) {
 			return {
-				dropComponent: DropComponent,
 				props: props
 			};
 		}
@@ -1162,7 +1088,7 @@ var App = (function (_React$Component) {
 			return _react2["default"].createElement(
 				"div",
 				{ style: { width: "100%", height: "100%" } },
-				_react2["default"].createElement(_infinityGrid2["default"], _extends({}, this.state.grid, { actions: _actions2["default"] }))
+				_react2["default"].createElement(_infinityGrid2["default"], _extends({}, this.props, this.state.grid, { actions: _actions2["default"] }))
 			);
 		}
 	}]);
@@ -1173,14 +1099,12 @@ var App = (function (_React$Component) {
 exports["default"] = App;
 module.exports = exports["default"];
 
-},{"../actions":13,"../store":24,"./infinity-grid":17,"react":"react"}],17:[function(_dereq_,module,exports){
+},{"../actions":13,"../store":22,"./infinity-grid":17,"react":"react"}],17:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
@@ -1229,9 +1153,13 @@ var target = {
 		var x = _monitor$getClientOffset.x;
 		var y = _monitor$getClientOffset.y;
 
-		props.actions.onAddComponent(monitor.getItem().dropComponent, {
-			x: x - props.domPos.x, y: y - props.domPos.y, props: monitor.getItem().props
-		});
+		if (monitor.getItem().props.onDrop) {
+			monitor.getItem().props.onDrop({
+				x: props.viewBox[0] + x - props.domPos.x,
+				y: props.viewBox[1] + y - props.domPos.y,
+				props: monitor.getItem().props
+			});
+		}
 	}
 };
 
@@ -1317,7 +1245,7 @@ var InfinityGrid = (function (_React$Component) {
 					if (this.state.draggingComponent === -1) {
 						this.setState({ draggingComponent: this.componentIndex });
 					}
-					return this.props.actions.onDragComponent(this.movement, this.state.draggingComponent);
+					return this.props.children[this.componentIndex].props.onDrag(this.movement);
 				default:
 			}
 		}
@@ -1353,18 +1281,6 @@ var InfinityGrid = (function (_React$Component) {
 			}
 		}
 	}, {
-		key: "changeComponentProps",
-		value: function changeComponentProps(idx, props) {
-			this.props.actions.onSetComponentProps(props, idx);
-		}
-	}, {
-		key: "onComponentClick",
-		value: function onComponentClick(idx) {
-			if (this.state.draggingComponent === -1) {
-				this.props.actions.onSelectComponent(idx);
-			}
-		}
-	}, {
 		key: "render",
 		value: function render() {
 			var _this = this;
@@ -1375,6 +1291,12 @@ var InfinityGrid = (function (_React$Component) {
 			var y = _props$viewBox[1];
 			var w = _props$viewBox[2];
 			var h = _props$viewBox[3];
+
+			var gridLines = this.props.gridSize ? [range(this.props.gridSize - x % this.props.gridSize + x - this.props.gridSize, w + this.props.gridSize, this.props.gridSize).map(function (val, i) {
+				return _react2["default"].createElement("line", { key: "x-" + i, stroke: "rgb(196,196,196)", x1: val, x2: val, y1: y, y2: y + h });
+			}), range(this.props.gridSize - y % this.props.gridSize + y - this.props.gridSize, h + this.props.gridSize, this.props.gridSize).map(function (val, i) {
+				return _react2["default"].createElement("line", { key: "y-" + i, stroke: "rgb(196,196,196)", x1: x, x2: x + w, y1: val, y2: val });
+			})] : [null, null];
 
 			return this.props.connectDropTarget(_react2["default"].createElement(
 				"svg",
@@ -1392,32 +1314,13 @@ var InfinityGrid = (function (_React$Component) {
 						height: this.props.viewBox[3] + 2 + "px"
 					},
 					viewBox: this.props.viewBox.join(" ") },
-				range(this.props.gridSize - x % this.props.gridSize + x - this.props.gridSize, w + this.props.gridSize, this.props.gridSize).map(function (val, i) {
-					return _react2["default"].createElement("line", { key: "x-" + i, stroke: "rgb(196,196,196)", x1: val, x2: val, y1: y, y2: y + h });
-				}),
-				range(this.props.gridSize - y % this.props.gridSize + y - this.props.gridSize, h + this.props.gridSize, this.props.gridSize).map(function (val, i) {
-					return _react2["default"].createElement("line", { key: "y-" + i, stroke: "rgb(196,196,196)", x1: x, x2: x + w, y1: val, y2: val });
-				}),
-				this.props.components.map(function (component, i) {
-					return [component, i];
-				}).filter(function (c) {
-					return !c[0].props.deleted;
-				}).map(function (c) {
-					var _c = _slicedToArray(c, 2);
-
-					var component = _c[0];
-					var i = _c[1];
-
+				gridLines[0],
+				gridLines[1],
+				_react2["default"].Children.map(this.props.children, function (childComponent, i) {
 					return _react2["default"].createElement(
 						"g",
-						{ key: i, transform: "translate(" + component.x + " " + component.y + ")" },
-						_react2["default"].createElement(component.component, _extends({}, component.props, {
-							componentIndex: i,
-							onMouseDown: _this.startComponentDrag.bind(_this, i),
-							onMouseUp: _this.onComponentClick.bind(_this, i),
-							onTouchStart: _this.startComponentDrag.bind(_this, i),
-							style: { opacity: _this.state.draggingComponent === i ? .5 : 1 }
-						}))
+						{ key: i, onMouseDown: _this.startComponentDrag.bind(_this, i), onTouchStart: _this.startComponentDrag.bind(_this, i) },
+						childComponent
 					);
 				})
 			));
@@ -1429,6 +1332,7 @@ var InfinityGrid = (function (_React$Component) {
 
 InfinityGrid.propTypes = {
 	actions: _react2["default"].PropTypes.object,
+	children: _react2["default"].PropTypes.node,
 	components: _react2["default"].PropTypes.array,
 	connectDropTarget: _react2["default"].PropTypes.func,
 	gridSize: _react2["default"].PropTypes.number,
@@ -1462,19 +1366,14 @@ var _components = _dereq_("./components");
 
 var _components2 = _interopRequireDefault(_components);
 
-var _actions = _dereq_("./actions");
-
-var _actions2 = _interopRequireDefault(_actions);
-
 var _componentsDraggable = _dereq_("./components/draggable");
 
 var _componentsDraggable2 = _interopRequireDefault(_componentsDraggable);
 
 exports.InfinityGrid = _components2["default"];
 exports.draggable = _componentsDraggable2["default"];
-exports.actions = _actions2["default"];
 
-},{"./actions":13,"./components":16,"./components/draggable":14}],20:[function(_dereq_,module,exports){
+},{"./components":16,"./components/draggable":14}],20:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1483,66 +1382,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var _utilSetIn = _dereq_("./util/set-in");
-
-var _utilSetIn2 = _interopRequireDefault(_utilSetIn);
-
-var _utilCloneDeep = _dereq_("./util/clone-deep");
-
-var _utilCloneDeep2 = _interopRequireDefault(_utilCloneDeep);
-
 var initialState = {
 	viewBox: [0, 0, 0, 0],
-	gridSize: 100,
-	components: [],
 	domPos: { x: 0, y: 0 }
 };
 
 exports["default"] = function (state, action) {
 	if (state === undefined) state = initialState;
 
-	var idx = undefined;
 	switch (action.type) {
 		case "SET_VIEWBOX_RECT":
 			return _extends({}, state, { viewBox: action.viewBox, domPos: action.domPos
-			});
-		case "ADD_COMPONENT":
-			return _extends({}, state, {
-				components: (0, _utilSetIn2["default"])([state.components.length], {
-					x: action.x,
-					y: action.y,
-					props: action.props,
-					component: action.component
-				}, state.components)
-			});
-		case "MOVE_COMPONENT":
-			idx = action.idx;
-			if (typeof state.components[idx] === "undefined") {
-				return state;
-			}
-			return _extends({}, state, {
-				components: (0, _utilSetIn2["default"])([idx], {
-					x: state.components[idx].x - action.movement.x,
-					y: state.components[idx].y - action.movement.y,
-					props: state.components[idx].props,
-					component: state.components[idx].component
-				}, state.components)
-			});
-		case "SET_COMPONENT_PROPS":
-			idx = action.idx;
-			return _extends({}, state, {
-				components: (0, _utilSetIn2["default"])([idx, "props"], _extends({}, state.components[idx].props, action.props), state.components)
-			});
-
-		case "SELECT_COMPONENT":
-			idx = action.idx;
-
-			return _extends({}, state, {
-				components: (0, _utilCloneDeep2["default"])(state.components).map(function (c, i) {
-					return _extends({}, c, { props: _extends({}, c.props, { selected: i === idx }) });
-				})
 			});
 		default:
 			return state;
@@ -1551,7 +1401,7 @@ exports["default"] = function (state, action) {
 
 module.exports = exports["default"];
 
-},{"./util/clone-deep":22,"./util/set-in":23}],21:[function(_dereq_,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1570,90 +1420,6 @@ exports["default"] = {
 module.exports = exports["default"];
 
 },{"./grid":20}],22:[function(_dereq_,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-function deepClone9(obj) {
-    var i, len, ret;
-
-    if (typeof obj !== "object" || obj === null) {
-        return obj;
-    }
-
-    if (Array.isArray(obj)) {
-        ret = [];
-        len = obj.length;
-        for (i = 0; i < len; i++) {
-            ret.push(typeof obj[i] === "object" && obj[i] !== null ? deepClone9(obj[i]) : obj[i]);
-        }
-    } else {
-        ret = {};
-        for (i in obj) {
-            if (obj.hasOwnProperty(i)) {
-                ret[i] = typeof obj[i] === "object" && obj[i] !== null ? deepClone9(obj[i]) : obj[i];
-            }
-        }
-    }
-    return ret;
-}
-
-exports["default"] = deepClone9;
-module.exports = exports["default"];
-
-},{}],23:[function(_dereq_,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var _cloneDeep = _dereq_("./clone-deep");
-
-var _cloneDeep2 = _interopRequireDefault(_cloneDeep);
-
-// Do either of these:
-//  a) Set a value by reference if deref is not null
-//  b) Set a value directly in to data object if deref is null
-var setEither = function setEither(data, deref, key, val) {
-	(deref || data)[key] = val;
-	return data;
-};
-
-// Set a nested value in data (not unlike immutablejs, but a clone of data is expected for proper immutability)
-var _setIn = function _setIn(_x2, _x3, _x4) {
-	var _arguments = arguments;
-	var _again = true;
-
-	_function: while (_again) {
-		var path = _x2,
-		    value = _x3,
-		    data = _x4;
-		_again = false;
-		var deref = _arguments.length <= 3 || _arguments[3] === undefined ? null : _arguments[3];
-
-		if (path.length > 1) {
-			_arguments = [_x2 = path, _x3 = value, _x4 = data, deref ? deref[path.shift()] : data[path.shift()]];
-			_again = true;
-			deref = undefined;
-			continue _function;
-		} else {
-			return setEither(data, deref, path[0], value);
-		}
-	}
-};
-
-var setIn = function setIn(path, value, data) {
-	return _setIn((0, _cloneDeep2["default"])(path), value, (0, _cloneDeep2["default"])(data));
-};
-
-exports["default"] = setIn;
-module.exports = exports["default"];
-
-},{"./clone-deep":22}],24:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
