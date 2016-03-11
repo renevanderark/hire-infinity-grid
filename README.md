@@ -1,7 +1,7 @@
 Infinity Grid
 ===
 
-[Demo here](http://renevanderark.github.io/infinity-grid/)
+[Demo here](http://renevanderark.github.io/hire-infinity-grid/)
 
 
 ```javascript
