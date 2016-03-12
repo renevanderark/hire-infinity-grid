@@ -27,9 +27,9 @@ const Rect = draggable(
 );
 
 const MAP = {
-	circle: (props) => (<circle className="handle" onDrag={(movement) => props.onComponentDrag(props.key, movement)} {...props} cx={props.x} cy={props.y} />),
-	square: (props) => (<rect {...props} className="handle" onDrag={(movement) => props.onComponentDrag(props.key, movement)} fill={props.fill} height={props.size} width={props.size} x={props.x} y={props.y} /> ),
-	rect: (props) => (<rect {...props} className="handle" onDrag={(movement) => props.onComponentDrag(props.key, movement)} fill={props.fill} height="10" width={props.size} x={props.x} y={props.y} /> )
+	circle: (props) => (<circle className="handle" onClick={() => props.onComponentClick(props.key)} onDrag={(movement) => props.onComponentDrag(props.key, movement)} {...props} cx={props.x} cy={props.y} r={props.size / 2} />),
+	square: (props) => (<rect {...props} className="handle" onClick={() => props.onComponentClick(props.key)} onDrag={(movement) => props.onComponentDrag(props.key, movement)} fill={props.fill} height={props.size} width={props.size} x={props.x} y={props.y} /> ),
+	rect: (props) => (<rect {...props} className="handle" onClick={() => props.onComponentClick(props.key)} onDrag={(movement) => props.onComponentDrag(props.key, movement)} fill={props.fill} height="10" width={props.size} x={props.x} y={props.y} /> )
 };
 
 class AppComponent extends React.Component {
@@ -56,6 +56,27 @@ class AppComponent extends React.Component {
 		});
 	}
 
+	onComponentClick(index) {
+		let components = clone(this.state.droppedComponents).map((c, i) => MAP[c.props.name]({
+			...c.props,
+			key: i,
+			fill: "black",
+			size: 30
+		}));
+		let {name} = components[index].props;
+
+
+		components[index] = MAP[name]({
+			...components[index].props,
+			key: index,
+			fill: "blue",
+			size: 40
+		});
+		this.setState({
+			droppedComponents: components
+		});
+	}
+
 	onDropComponent(data) {
 		const {x, y, props} = data;
 		this.setState({
@@ -63,7 +84,7 @@ class AppComponent extends React.Component {
 				...this.state.droppedComponents, MAP[props.name]({
 					...props, x: x, y: y, key: this.state.droppedComponents.length,
 					onComponentDrag: this.onComponentDrag.bind(this),
-					onClick: () => console.log("click", props.name)
+					onComponentClick: this.onComponentClick.bind(this)
 				})
 			]
 		});
@@ -79,7 +100,7 @@ class AppComponent extends React.Component {
 						fill="rgb(0,0,0)"
 						name="circle"
 						onDrop={this.onDropComponent.bind(this)}
-						r="16"
+						size="30"
 						/>
 				</div>
 
@@ -100,7 +121,7 @@ class AppComponent extends React.Component {
 				</div>
 
 				<div style={{width: "100%", height: "500px"}}>
-					<InfinityGrid>
+					<InfinityGrid gridSize={100}>
 						{this.state.droppedComponents}
 					</InfinityGrid>
 				</div>
